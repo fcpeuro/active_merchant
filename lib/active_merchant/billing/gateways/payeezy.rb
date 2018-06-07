@@ -73,10 +73,12 @@ module ActiveMerchant
         commit(params, options)
       end
 
-      def store(payment_method, options = {})
+      def store(payment_method, options = {}) #creditcard object
         params = {transaction_type: 'store'}
 
         add_creditcard_for_tokenization(params, payment_method, options)
+
+        puts "Card tokenization data within Payeezy#store: #{params.inspect}"
 
         commit(params, options)
       end
@@ -138,8 +140,8 @@ module ActiveMerchant
         params[:apikey] = @options[:apikey]
         params[:ta_token] = options[:ta_token]
         params[:type] = 'FDToken'
-        params[:credit_card] = add_card_data(payment_method)
-        params[:auth] = 'false'
+        params[:credit_card] = add_card_data(payment_method) #creditcard instance
+        params[:auth] = "false"
       end
 
       def is_store_action?(params)
@@ -196,13 +198,17 @@ module ActiveMerchant
         params[:credit_card] = credit_card
       end
 
-      def add_card_data(payment_method)
+      def add_card_data(payment_method) #creditcard instance
+        puts "Pulling credit card info within ActiveMerchant\n" * 3
         card = {}
         card[:type] = CREDIT_CARD_BRAND[payment_method.brand]
         card[:cardholder_name] = payment_method.name
         card[:card_number] = payment_method.number
         card[:exp_date] = format_exp_date(payment_method.month, payment_method.year)
         card[:cvv] = payment_method.verification_value if payment_method.verification_value?
+        
+        puts card.inspect
+        
         card
       end
 
@@ -239,14 +245,9 @@ module ActiveMerchant
         if transaction_id = params.delete(:transaction_id)
           url = "#{url}/#{transaction_id}"
         end
-
-        begin
-          response = api_request(url, params)
-        rescue ResponseError => e
-          response = response_error(e.response.body)
-        rescue JSON::ParserError
-          response = json_error(e.response.body)
-        end
+        
+        puts "Params as they appear within P#commit: #{params.inspect}"
+        response = api_request(url, params)
 
         Response.new(
           success_from(response),
@@ -275,8 +276,22 @@ module ActiveMerchant
       end
 
       def api_request(url, params)
+        puts "sending an API Request from Payeezy in AM" * 3
+  
+ 
         body = params.to_json
-        parse(ssl_post(url, body, headers(body)))
+        
+        
+        if is_store_action?(params)
+          raise
+        end
+        
+        puts body
+        puts headers(body)
+
+        r = ssl_post(url, body, headers(body))
+        
+        parse(r)
       end
 
       def post_data(params)
