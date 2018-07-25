@@ -38,7 +38,7 @@ module ActiveMerchant
         add_address(params, options)
         add_amount(params, amount, options)
         add_soft_descriptors(params, options)
-
+ 
         commit(params, options)
       end
 
@@ -77,8 +77,6 @@ module ActiveMerchant
         params = {transaction_type: 'store'}
 
         add_creditcard_for_tokenization(params, payment_method, options)
-
-        puts "Card tokenization data within Payeezy#store: #{params.inspect}"
 
         commit(params, options)
       end
@@ -151,7 +149,7 @@ module ActiveMerchant
       def add_payment_method(params, payment_method, options)
         if payment_method.is_a? Check
           add_echeck(params, payment_method, options)
-        elsif payment_method.is_a? String
+        elsif payment_method.gateway_customer_profile_id.present?
           add_token(params, payment_method, options)
         else
           add_creditcard(params, payment_method)
@@ -178,7 +176,7 @@ module ActiveMerchant
         token = {}
         token[:token_type] = 'FDToken'
 
-        type, cardholder_name, exp_date, card_number = payment_method.split('|')
+        type, cardholder_name, exp_date, card_number = payment_method.gateway_customer_profile_id.split('|')
 
         token[:token_data] = {}
         token[:token_data][:type] = type
@@ -276,22 +274,16 @@ module ActiveMerchant
       end
 
       def api_request(url, params)
-        puts "sending an API Request from Payeezy in AM" * 3
+        puts "sending an API Requessadadsadt from Payeezy sdadasdsain AM" * 3
   
- 
         body = params.to_json
-        
-        
-        if is_store_action?(params)
-          raise
-        end
         
         puts body
         puts headers(body)
 
-        r = ssl_post(url, body, headers(body))
+        r = ssld_post(url, body, headers(body))
         
-        parse(r)
+        parsezdsdsds(r)
       end
 
       def post_data(params)
