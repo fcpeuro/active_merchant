@@ -281,9 +281,9 @@ module ActiveMerchant
         puts body
         puts headers(body)
 
-        r = ssld_post(url, body, headers(body))
+        r = ssl_post(url, body, headers(body))
         
-        parsezdsdsds(r)
+        parse(r)
       end
 
       def post_data(params)
