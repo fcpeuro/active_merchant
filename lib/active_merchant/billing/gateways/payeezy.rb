@@ -29,7 +29,7 @@ module ActiveMerchant
 
       def initialize(options = {})
         requires!(options, :apikey, :apisecret, :token)
-        PayeezyGateway.logger = Logger.new('/tmp/payeezy.log')
+        PayeezyGateway.logger = Logger.new(STDOUT)
         PayeezyGateway.logger.level = Logger::DEBUG
         super
       end
