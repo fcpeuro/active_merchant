@@ -1,3 +1,5 @@
+require 'logger'
+
 module ActiveMerchant
   module Billing
     class PayeezyGateway < Gateway
@@ -27,6 +29,8 @@ module ActiveMerchant
 
       def initialize(options = {})
         requires!(options, :apikey, :apisecret, :token)
+        PayeezyGateway.logger = Logger.new('/tmp/payeezy.log')
+        PayeezyGateway.logger.level = Logger::DEBUG
         super
       end
 
@@ -276,6 +280,11 @@ module ActiveMerchant
 
       def api_request(url, params)
         body = params.to_json
+        
+        logger.debug url
+        logger.debug params
+        logger.debug headers(body)
+        
         parse(ssl_post(url, body, headers(body)))
       end
 
