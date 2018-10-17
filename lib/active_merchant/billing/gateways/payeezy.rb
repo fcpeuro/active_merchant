@@ -342,7 +342,7 @@ module ActiveMerchant
         elsif response.key?('fault')
           response['fault'].to_h['faultstring']
         else
-          response['bank_message'] || response['gateway_message'] || 'Failure to successfully create token.'
+          response['gateway_message'] || 'Transaction not authorized.'
         end
       end
 
