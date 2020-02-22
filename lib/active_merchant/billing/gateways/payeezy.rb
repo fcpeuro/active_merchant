@@ -342,7 +342,8 @@ module ActiveMerchant
         elsif response.key?('fault')
           response['fault'].to_h['faultstring']
         else
-          response['bank_message'] || response['gateway_message'] || 'Transaction not authorized.'
+          message = response['bank_message'] || response['gateway_message'] || 'Please contact your payment provider for more information.'
+          "Transaction could not be processed. Reason: #{message}"
         end
       end
 
